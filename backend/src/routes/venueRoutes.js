@@ -12,5 +12,7 @@ router.get('/search', venueController.searchVenues);
 router.get('/:id', venueController.getVenue);
 router.get('/:id/calendar', venueController.getVenueCalendar);
 router.get('/:id/suitability', venueController.checkSuitability);
+router.patch('/:id', requireRole('venue_staff'), venueController.updateVenue);
+router.delete('/:id', requireRole('venue_staff'), venueController.deactivateVenue);
 
 module.exports = router;

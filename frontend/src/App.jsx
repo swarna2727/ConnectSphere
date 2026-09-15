@@ -12,6 +12,8 @@ import EventForm from './pages/events/EventForm';
 import EventDetail from './pages/events/EventDetail';
 
 import VenueList from './pages/venues/VenueList';
+import VenueForm from './pages/venues/VenueForm';
+import VenueDetail from './pages/venues/VenueDetail';
 import VenueCalendar from './pages/venues/VenueCalendar';
 
 import EquipmentList from './pages/equipment/EquipmentList';
@@ -40,7 +42,12 @@ export default function App() {
           <Route path="/events/:id" element={<ProtectedRoute><EventDetail /></ProtectedRoute>} />
 
           <Route path="/venues" element={<ProtectedRoute><VenueList /></ProtectedRoute>} />
-          <Route path="/venues/:id" element={<ProtectedRoute><VenueCalendar /></ProtectedRoute>} />
+          <Route
+            path="/venues/new"
+            element={<ProtectedRoute roles={['venue_staff']}><VenueForm /></ProtectedRoute>}
+          />
+          <Route path="/venues/:id" element={<ProtectedRoute><VenueDetail /></ProtectedRoute>} />
+          <Route path="/venues/:id/calendar" element={<ProtectedRoute><VenueCalendar /></ProtectedRoute>} />
 
           <Route path="/equipment" element={<ProtectedRoute><EquipmentList /></ProtectedRoute>} />
 

@@ -47,6 +47,23 @@ async function hasConflict(venueId, startDatetime, endDatetime, excludeBookingId
   return rows.length > 0;
 }
 
+// "Update Venue Record" + "Delete Venue Record" ACs: both need to know which
+// upcoming *confirmed* bookings would be affected by a venue change, along
+// with enough event info (attendance, layout preference) to judge impact.
+async function listUpcomingApprovedBookingsForVenue(venueId) {
+  const { rows } = await query(
+    `SELECT vb.id AS booking_id, vb.start_datetime, vb.end_datetime,
+            e.id AS event_id, e.name AS event_name,
+            e.expected_attendance, e.room_layout_preference
+     FROM venue_bookings vb
+     JOIN events e ON e.id = vb.event_id
+     WHERE vb.venue_id = $1 AND vb.status = 'approved' AND vb.start_datetime >= now()
+     ORDER BY vb.start_datetime ASC`,
+    [venueId]
+  );
+  return rows;
+}
+
 // ---- Equipment reservations ----
 
 async function createEquipmentReservation(data) {
@@ -79,6 +96,7 @@ module.exports = {
   decideVenueBooking,
   listVenueBookingsForEvent,
   listPendingVenueBookings,
+  listUpcomingApprovedBookingsForVenue,
   hasConflict,
   createEquipmentReservation,
   decideEquipmentReservation,

@@ -189,3 +189,8 @@ CREATE TABLE IF NOT EXISTS audit_log (
 );
 
 CREATE INDEX IF NOT EXISTS idx_audit_entity ON audit_log(entity_type, entity_id);
+
+-- Added for "Create Venue Records" story: tracks whether all required
+-- fields are filled, so incomplete venues can be saved as drafts but
+-- excluded from Event Coordinator search/catalogue until complete.
+ALTER TABLE venues ADD COLUMN IF NOT EXISTS is_complete BOOLEAN NOT NULL DEFAULT false;

@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../api/client';
 
-// Covers: Venue Catalogue + Venue Search and Filtering (basic version).
+// Covers: Venue Catalogue + Venue Search and Filtering + entry point for
+// "Create Venue Records" (the "New venue" button, Venue Staff only).
 export default function VenueList() {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [venues, setVenues] = useState([]);
   const [minCapacity, setMinCapacity] = useState('');
   const [error, setError] = useState('');
@@ -19,7 +20,11 @@ export default function VenueList() {
 
   return (
     <div>
-      <h1>Venues</h1>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1>Venues</h1>
+        {user.role === 'venue_staff' && <Link to="/venues/new"><button>New venue</button></Link>}
+      </div>
+
       <div className="card">
         <label>Minimum capacity
           <input type="number" min="0" value={minCapacity} onChange={(e) => setMinCapacity(e.target.value)} style={{ maxWidth: 150 }} />
@@ -31,16 +36,22 @@ export default function VenueList() {
 
       {venues.map((v) => (
         <div className="card" key={v.id}>
-          <h3><Link to={`/venues/${v.id}`}>{v.name}</Link></h3>
+          <h3>
+            <Link to={`/venues/${v.id}`}>{v.name}</Link>{' '}
+            <span className="badge">{v.status}</span>{' '}
+            {!v.is_complete && <span className="badge">draft</span>}
+          </h3>
           <p>{v.location}</p>
-          <p>Capacity: {v.capacity}</p>
+          <p>Capacity: {v.capacity ?? '—'}</p>
         </div>
       ))}
 
-      <div className="todo-note">
-        TODO: full filter set (date/time availability, accessibility, layout,
-        facilities) per "Venue Search and Filtering" — see venueModel.search().
-      </div>
+      {user.role === 'venue_staff' && (
+        <p style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+          As Venue Staff, you see all venues here including drafts and deactivated
+          ones. Event Coordinators only see complete, active venues.
+        </p>
+      )}
     </div>
   );
 }
